@@ -1,0 +1,6 @@
+
+
+php page add: target div, script tag for App js components, do i need react script tag too?
+decide where node modules folder will live (wp-content/themes)
+install npm
+create js file for components in scripts/pages
