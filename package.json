@@ -1,7 +1,7 @@
 {
-  "name": "React-Starter-Kit",
+  "name": "Interactive Retirement Graph",
   "version": "0.0.0",
-  "description": "Get started with react fast!",
+  "description": "",
   "author": "Jake Obron <jbobron@gmail.com>",
   "bin": {
     "module-name": "./bin/module-name"
@@ -9,7 +9,7 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/jbobron/interactiveRetirementGraph"
+    "url": "https://github.com/jbobron/interactiveRetirementGraph.git"
   },
   "keywords": [],
   "dependencies": {
