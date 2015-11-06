@@ -1,5 +1,4 @@
 var React = require('react');
-var Parent = require('./components/Parent');
+var Main = require('./components/Main');
 
-
-React.render(<Parent />, document.getElementById('app'));
+React.render(<Main />, document.getElementById('app'));

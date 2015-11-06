@@ -4,3 +4,24 @@ php page add: target div, script tag for App js components, do i need react scri
 decide where node modules folder will live (wp-content/themes)
 install npm
 create js file for components in scripts/pages
+
+
+
+
+todos:
+	allow for sliders to be slideable
+	trigger some kind of visual change in assetGraph component on slider change
+
+
+
+
+other features
+
+mobile friendly
+	-responsive data chart (touch graph to see data points)
+		-shrink graph to show x axis in 5 years
+	-touch friendly slides
+
+
+
+
