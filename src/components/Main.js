@@ -8,17 +8,19 @@ var FriendsContainer = React.createClass({
       retirementAge: 50,
       minimumAge: 20,
       maximumAge: 100,
-      currentSalary: 30000,
-      totalAssets: 1000,
+      currentSalary: 50000,
+      totalAssets: 0,
       performancePercentage: 5,
       annualSavingsPercentage: 8,
       config: {
+
         ///this should be empty to start then on react initial load, populate using calcNewRetArr with min and max age
         series: [{ name: "Assets", data: [] }],
         //this should be empty to start then on react initial load, populate config.xAxis.categories with ages starting from min age and ending with max age
         xAxis: { title: { text: 'Time (Years)' }, categories: [] },
         legend: { enabled: false },
-        yAxis: { title: { text: "Assets in Dollars ($)" } }
+        yAxis: { title: { text: "Assets in Dollars ($)" } },
+        tooltip: { valueDecimals: 2, valuePrefix: '$', valueSuffix: ' USD' },
       }
     }
   },
@@ -78,7 +80,7 @@ var FriendsContainer = React.createClass({
                    min="20"
                    max="100"
                    step="1"
-                   value={this.state.annualSavings}
+                   value={this.state.retirementAge}
                    onChange={this.handleChange.bind(this,'retirementAge')} 
                    onMouseUp={this.handleAgeRangeChange.bind(this,(this,'retirementAge'))}>
             </input>
@@ -101,7 +103,7 @@ var FriendsContainer = React.createClass({
                    maxlength="8"
                    value={this.state.currentSalary} 
                    onChange={this.handleChange.bind(this,'currentSalary')}
-                   handleKeyDown={this.handleKeyDown.bind(this,(this,'totalAssets'))}>
+                   handleKeyDown={this.handleKeyDown.bind(this,(this,'currentSalary'))}>
             </input> 
           </li>
           <li style={style.sliders}>
@@ -142,22 +144,29 @@ function populateAgeArray(min, max){
   return arr;
 }
 
-function calculateNewRetirementArray(startAge, endAge, capital, performancePercentage, currentSalary, annualSavingsPercentage){
+function calculateNewRetirementArray(startAge, endAge, total, performancePercentage, currentSalary, annualSavingsPercentage){
   var savingsConstant = currentSalary * (annualSavingsPercentage / 100);
   var performanceDecimal = (performancePercentage / 100) + 1;
   var totalYears = endAge - startAge;
   var arr = [];
-  var i = 1;
-  while(totalYears-- > 0){
-    arr.push( (capital + savingsConstant *i ) * Math.pow(performanceDecimal, i) );
-    i++;
+  var t = 1;
+  var total;
+  while(t < totalYears){
+    debugger;
+    total = total + (savingsConstant * Math.pow(performanceDecimal, t)) + ( (Math.pow(performanceDecimal, t) - 1) / performanceDecimal - 1 ) * performanceDecimal;
+    arr.push( total );
+    t++;
   }
+  console.log(arr);
   //account for after retirement here
   while(arr.length !== 100){
     arr.push(1000000)
   }
   return arr;
 }
+
+
+
 function calculateNewAgeArray(startAge, endAge){
   var arr = [];
   for(var i = startAge; i < endAge; i++){

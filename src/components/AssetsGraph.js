@@ -1,5 +1,7 @@
 var React = require('react');
 var Highcharts = require('react-highcharts');
+// debugger;
+Highcharts.Highcharts.setOptions({lang: { thousandsSep: ',' }})
 
 var AssetsGraph = React.createClass({
   shouldComponentUpdate: function(nextProps) { //if there is a change to this.props.config return true, else return false
@@ -9,7 +11,7 @@ var AssetsGraph = React.createClass({
     return (
       <div>
         <h3>Your Assets</h3>
-        <Highcharts id="container" config={this.props.config}/>
+        <Highcharts id="container" config={this.props.config} />
       </div>
     )
   }
