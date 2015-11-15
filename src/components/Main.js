@@ -1,3 +1,22 @@
+/*
+intially newData and chart.series[0].yData are equal with one zero in front
+when inc current age happens, we add x zeros to beginning of yData
+when inc total assets happens, we take yData and find how many zeros there are at the front
+then newData is recalculated based on inc/dec in total assets
+then x zeros are added to front of newData
+then we set newData as series data 
+
+yData : [0,0,0,0,0,.....]
+newData: [0,0,0,0,0,1000, 5400, .....]
+newData pt2: [0,0,0,0,0,0,4200, ...]
+
+
+Something like check newData/yData at index numOfZeros in
+if it is a zero add one less zero
+if it is not a zero add normal numOfZeros
+*/
+
+
 var React = require('react');
 var AssetsGraph = require('./AssetsGraph');
 
@@ -13,8 +32,8 @@ var FriendsContainer = React.createClass({
       totalAssets: 0,
       performancePercentage: 5,
       annualSavingsPercentage: 8,
+      wasHandleAgeRangeChangeCalled: false,
       config: {
-
         ///this should be empty to start then on react initial load, populate using calcNewRetArr with min and max age
         series: [{ name: "Assets", data: [] }],
         //this should be empty to start then on react initial load, populate config.xAxis.categories with ages starting from min age and ending with max age
@@ -32,16 +51,30 @@ var FriendsContainer = React.createClass({
     var populatedAssetsArray = calculateNewRetirementArray(this.state.minimumAge, this.state.maximumAge, this.state.totalAssets, this.state.performancePercentage, this.state.currentSalary, this.state.annualSavingsPercentage);
     this.state.config = setStateFor('yAxis', populatedAssetsArray, this.state.config);
   },
-  //46 - 39
   handleMouseUp: function(e){
+    //slice off one extra from end and add one extra zero 
     console.log("in handle mouse up")
-    //generate new data set for graph
-    var newData = calculateNewRetirementArray(this.state.minimumAge, this.state.maximumAge, this.state.totalAssets, this.state.performancePercentage, this.state.currentSalary, this.state.annualSavingsPercentage);
     var chart = $('#container').highcharts();
-    this.state.config = setStateFor('yAxis', newData, this.state.config)
+    var noNullsArr = chart.series[0].yData.filter(function(value, index){
+      // if(index === 0) return true;
+      return value !== 0.1
+    });
+    var numOfNulls = chart.series[0].yData.length - noNullsArr.length;
+    var newData = calculateNewRetirementArray(this.state.minimumAge, this.state.maximumAge, this.state.totalAssets, this.state.performancePercentage, this.state.currentSalary, this.state.annualSavingsPercentage);
+    if(this.state.wasHandleAgeRangeChangeCalled){
+      debugger;
+      var newData = newData.slice(0,newData.length-numOfNulls);
+      while(numOfNulls-- > 0) newData.unshift(0.1);
+    }
+    else {
+      this.state.config = setStateFor('yAxis', newData, this.state.config)
+    }
+    // chart.series[0].yData
     chart.series[0].setData(newData);
   },
   handleAgeRangeChange: function(name, e){ // this uses 'slice' (setExtremes) and keep original full config.xAxis.categories array
+    this.setState({wasHandleAgeRangeChangeCalled: true})
+    if(this.state.currentAge === this.state.minimumAge) this.setState({wasHandleAgeRangeChangeCalled: false})
     var chart = $('#container').highcharts();
     var changeInAge =  this.state.currentAge - this.state.previousCurrentAge;
     var storageArr = []; 
@@ -49,7 +82,7 @@ var FriendsContainer = React.createClass({
     chart.xAxis[0].setExtremes(this.state.currentAge - this.state.minimumAge, this.state.retirementAge - this.state.minimumAge);
     if(changeInAge > 0){ // for inc in current age, zeros are added to beginning of yData to correctly reflect starting assets as initial assets
       for(var i = 0; i < changeInAge; i++){
-        chart.series[0].yData.unshift(0);
+        chart.series[0].yData.unshift(0.1);
         storageArr.push(chart.series[0].yData.pop()); //less years for compound interest means smaller ending assets, x values are removed from end of yData to reflect this
       }
     }
@@ -63,7 +96,8 @@ var FriendsContainer = React.createClass({
   },
   handleKeyDown: function(e){
     var ENTER = 13;
-    if( e.keyCode == ENTER ) { this.handleMouseUp(e); }
+    if( e.keyCode == ENTER ) this.handleMouseUp(e); 
+
   },
   componentDidMount: function() {
     $(document.body).on('keydown', this.handleKeyDown);
@@ -168,15 +202,12 @@ function calculateNewRetirementArray(startAge, endAge, startingAssets, performan
   var arr = [];
   var t = 0;
   var total;
-  debugger;
+  // debugger;
   while(t < totalYears){
     total = (startingAssets * Math.pow(performanceDecimal, t)) + (savingsConstant * ((Math.pow(performanceDecimal, t) - 1) / (performanceDecimal - 1)) * performanceDecimal);
-    //total = total + (savingsConstant * Math.pow(performanceDecimal, t)) + ( (Math.pow(performanceDecimal, t) - 1) / performanceDecimal - 1 ) * performanceDecimal;
-    // if(t===0) total = 0;
     arr.push( total );
     t++;
   }
-  console.log(arr);
   //account for after retirement here
   while(arr.length !== 100){
     arr.push(1000000)
