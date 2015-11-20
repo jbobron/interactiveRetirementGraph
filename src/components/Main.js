@@ -1,22 +1,3 @@
-/*
-intially newData and chart.series[0].yData are equal with one zero in front
-when inc current age happens, we add x zeros to beginning of yData
-when inc total assets happens, we take yData and find how many zeros there are at the front
-then newData is recalculated based on inc/dec in total assets
-then x zeros are added to front of newData
-then we set newData as series data 
-
-yData : [0,0,0,0,0,.....]
-newData: [0,0,0,0,0,1000, 5400, .....]
-newData pt2: [0,0,0,0,0,0,4200, ...]
-
-
-Something like check newData/yData at index numOfZeros in
-if it is a zero add one less zero
-if it is not a zero add normal numOfZeros
-*/
-
-
 var React = require('react');
 var AssetsGraph = require('./AssetsGraph');
 
@@ -32,6 +13,7 @@ var FriendsContainer = React.createClass({
       totalAssets: 0,
       performancePercentage: 5,
       annualSavingsPercentage: 8,
+      companyMatchPercentage: 0,
       wasHandleAgeRangeChangeCalled: false,
       config: {
         ///this should be empty to start then on react initial load, populate using calcNewRetArr with min and max age
@@ -52,24 +34,21 @@ var FriendsContainer = React.createClass({
     this.state.config = setStateFor('yAxis', populatedAssetsArray, this.state.config);
   },
   handleMouseUp: function(e){
-    //slice off one extra from end and add one extra zero 
-    console.log("in handle mouse up")
     var chart = $('#container').highcharts();
+    var searchForMe = chart.series[0].yData[0];
     var noNullsArr = chart.series[0].yData.filter(function(value, index){
-      // if(index === 0) return true;
-      return value !== 0.1
+      return value !== searchForMe;
     });
     var numOfNulls = chart.series[0].yData.length - noNullsArr.length;
     var newData = calculateNewRetirementArray(this.state.minimumAge, this.state.maximumAge, this.state.totalAssets, this.state.performancePercentage, this.state.currentSalary, this.state.annualSavingsPercentage);
+    var firstVal = newData[0]; 
     if(this.state.wasHandleAgeRangeChangeCalled){
-      debugger;
       var newData = newData.slice(0,newData.length-numOfNulls);
-      while(numOfNulls-- > 0) newData.unshift(0.1);
+      while(numOfNulls-- > 0) newData.unshift(firstVal + 0.1);
     }
     else {
       this.state.config = setStateFor('yAxis', newData, this.state.config)
     }
-    // chart.series[0].yData
     chart.series[0].setData(newData);
   },
   handleAgeRangeChange: function(name, e){ // this uses 'slice' (setExtremes) and keep original full config.xAxis.categories array
@@ -80,9 +59,10 @@ var FriendsContainer = React.createClass({
     var storageArr = []; 
     this.setState({previousCurrentAge: this.state.currentAge})
     chart.xAxis[0].setExtremes(this.state.currentAge - this.state.minimumAge, this.state.retirementAge - this.state.minimumAge);
+    var firstVal = chart.series[0].yData[0];
     if(changeInAge > 0){ // for inc in current age, zeros are added to beginning of yData to correctly reflect starting assets as initial assets
       for(var i = 0; i < changeInAge; i++){
-        chart.series[0].yData.unshift(0.1);
+        chart.series[0].yData.unshift(firstVal + 0.1);
         storageArr.push(chart.series[0].yData.pop()); //less years for compound interest means smaller ending assets, x values are removed from end of yData to reflect this
       }
     }
@@ -99,17 +79,24 @@ var FriendsContainer = React.createClass({
     if( e.keyCode == ENTER ) this.handleMouseUp(e); 
 
   },
+  computeMaxSavingsPercentage : function() {
+    console.log("hereee")
+    // debugger;
+    //set max to be current salary * x = 18,000 with x being max
+    return (18000 / this.state.currentSalary * 100) > 100 ? 100 : (18000 / this.state.currentSalary * 100); 
+  },
   componentDidMount: function() {
     $(document.body).on('keydown', this.handleKeyDown);
     var chart = $('#container').highcharts();
     chart.xAxis[0].setExtremes(this.state.currentAge - this.state.minimumAge, this.state.retirementAge - this.state.minimumAge);
   },
   handleChange: function(name, e){
-    if(name === 'annualSavingsPercentage') this.setState({ annualSavingsPercentage: e.target.valueAsNumber});
-    if(name === 'retirementAge') this.setState({ retirementAge: e.target.valueAsNumber});
     if(name === 'currentAge') this.setState({ currentAge: e.target.valueAsNumber});
-    if(name === 'currentSalary') this.setState({ currentSalary: e.target.valueAsNumber});
-    if(name === 'totalAssets') this.setState({ totalAssets: e.target.valueAsNumber});
+    if(name === 'retirementAge') this.setState({ retirementAge: e.target.valueAsNumber});
+    if(name === 'annualSavingsPercentage') this.setState({ annualSavingsPercentage: e.target.valueAsNumber});
+    if(name === 'companyMatchPercentage') this.setState({ companyMatchPercentage: e.target.valueAsNumber});
+    if(name === 'currentSalary') this.setState({ currentSalary: Math.abs(e.target.valueAsNumber) || 0});
+    if(name === 'totalAssets') this.setState({ totalAssets: Math.abs(e.target.valueAsNumber) || 0});
   },
   render: function(){
     return (
@@ -139,14 +126,25 @@ var FriendsContainer = React.createClass({
             </input>
           </li>
           <li style={style.sliders}>
-            <h3>Annual Savings: {this.state.annualSavingsPercentage} % </h3>
+            <h3>Annual Savings Percentage: {this.state.annualSavingsPercentage} % </h3>
             <input type="range"
                    min="0"
-                   max="100"
-                   step="1"
-                   value={this.state.annualSavingsPercentage} 
+                   max={this.computeMaxSavingsPercentage()} //set max to be current salary * x = 18,000 with x being max
+                   step="1"  //{this.computeMaxSavingsPercentage.bind(this, this.state.currentSalary)}
+                   value={this.state.annualSavingsPercentage}  
                    onChange={this.handleChange.bind(this,'annualSavingsPercentage')} 
                    onMouseUp={this.handleMouseUp.bind(this,(this,'annualSavingsPercentage'))}>
+            </input>
+          </li>
+          <li style={style.sliders}>
+            <h3>Company Match Percentage: {this.state.companyMatchPercentage} % </h3>
+            <input type="range"
+                   min="0"
+                   max="8"
+                   step="1"
+                   value={this.state.companyMatchPercentage} 
+                   onChange={this.handleChange.bind(this,'companyMatchPercentage')} 
+                   onMouseUp={this.handleMouseUp.bind(this,(this,'companyMatchPercentage'))}>
             </input>
           </li>
           <li style={style.sliders}>
@@ -170,7 +168,7 @@ var FriendsContainer = React.createClass({
             </input>
           </li>
         </ul>
-        <AssetsGraph config={this.state.config}/>
+        <AssetsGraph ref="chart" config={this.state.config}/>
       </div>
     )
   }
@@ -208,9 +206,12 @@ function calculateNewRetirementArray(startAge, endAge, startingAssets, performan
     arr.push( total );
     t++;
   }
+
+  //account for after retirement here
+  var lastVal = arr[arr.length-1]
   //account for after retirement here
   while(arr.length !== 100){
-    arr.push(1000000)
+    arr.push(lastVal-=100000)
   }
   return arr;
 }
@@ -221,16 +222,6 @@ function calculateNewAgeArray(startAge, endAge){
     arr.push(parseInt(i));
   }
   return arr;
-  //if inc in years range -> call calculateNewRetirementArray with new age range and modify unshift / push categories array
-    //if inc in retirement age
-      //
-    //if dec in current age
-
-  //if dec in years range
-    //if dec in retirement age
-        // slice off x values from series array and categories array
-    //if inc in current age
-        // shift off x values from series array and categories array
 }
 
 var style = {
