@@ -22,25 +22,3 @@ var CurrentSalary = React.createClass({
 })
 
 module.exports = CurrentSalary;
-
-
-/*
-any time i inc currently salary
-i need to re-adjust max annualSavingsMax
-
--if the user has annualSavings value at zero or below annualSavingsMax keep it at current Value
--if the user has annualSavings value above the annualSavingsMax 
-  -set annualSaving value to recalculated max
-
-18k 
-
-
-
-
-
-
-
-
-
-*/
-

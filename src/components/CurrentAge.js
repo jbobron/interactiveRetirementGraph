@@ -19,4 +19,3 @@ var CurrentAge = React.createClass({
 })
 
 module.exports = CurrentAge;
-

@@ -36,7 +36,7 @@ var Main = React.createClass({
     this.setState({previousCurrentAge: this.state.currentAge})
     var populatedAgeArray = populateAgeArray(this.state.minimumAge, this.state.maximumAge);
     this.state.config = setStateFor('xAxis', populatedAgeArray, this.state.config);
-    var populatedAssetsArray = calculateNewRetirementArray(this.state.minimumAge, this.state.maximumAge, this.state.totalAssets, this.state.performancePercentage, this.state.currentSalary, this.state.annualSavingsPercentage);
+    var populatedAssetsArray = calculateNewRetirementArray(this.state.minimumAge, this.state.maximumAge, this.state.totalAssets, this.state.performancePercentage, this.state.currentSalary, this.state.annualSavingsPercentage, this.state.companyMatchPercentage);
     this.state.config = setStateFor('yAxis', populatedAssetsArray, this.state.config);
   },
   handleMouseUp: function(e){
@@ -46,14 +46,14 @@ var Main = React.createClass({
       return value !== searchForMe;
     });
     var numOfNulls = chart.series[0].yData.length - noNullsArr.length;
-    var newData = calculateNewRetirementArray(this.state.minimumAge, this.state.maximumAge, this.state.totalAssets, this.state.performancePercentage, this.state.currentSalary, this.state.annualSavingsPercentage);
-    var firstVal = newData[0]; 
+    var newData = calculateNewRetirementArray(this.state.minimumAge, this.state.maximumAge, this.state.totalAssets, this.state.performancePercentage, this.state.currentSalary, this.state.annualSavingsPercentage, this.state.companyMatchPercentage);
+    var firstVal = newData[0];
     if(this.state.wasHandleAgeRangeChangeCalled){
       var newData = newData.slice(0,newData.length-numOfNulls);
       while(numOfNulls-- > 0) newData.unshift(firstVal + 0.1);
     }
     else {
-      this.state.config = setStateFor('yAxis', newData, this.state.config)
+      this.state.config = setStateFor('yAxis', newData, this.state.config);
     }
     chart.series[0].setData(newData);
   },
@@ -149,8 +149,11 @@ function populateAgeArray(min, max){
   return arr;
 }
 
-function calculateNewRetirementArray(startAge, endAge, startingAssets, performancePercentage, currentSalary, annualSavingsPercentage){
-  var savingsConstant = currentSalary * (annualSavingsPercentage / 100);
+function calculateNewRetirementArray(startAge, endAge, startingAssets, performancePercentage, currentSalary, annualSavingsPercentage, companyMatchPercentage){
+  
+  var savingsConstant = (currentSalary * (annualSavingsPercentage / 100)) + (currentSalary * (companyMatchPercentage / 100));
+  debugger;
+  console.log("savingsConstant", savingsConstant)
   var performanceDecimal = (performancePercentage / 100) + 1;
   var totalYears = endAge - startAge;
   var arr = [];
