@@ -92,11 +92,13 @@ var Main = React.createClass({
   },
   recalculateMaxSavingsPercentage : function(){
     var maxSavingsPercentage = (18000/this.state.currentSalary)*100 > 100 ? 100 : (18000/this.state.currentSalary)*100;
+    maxSavingsPercentage = parseInt(maxSavingsPercentage.toFixed(2));
     this.setState({ maxSavingsPercentage: maxSavingsPercentage });
   },
   recalculateAnnualSavingsPercentage : function(userPercentage){
     var savingsPercentage = (userPercentage/100) * this.state.currentSalary > 18000 ? (18000/this.state.currentSalary)*100 : userPercentage;
-    this.setState({ annualSavingsPercentage: savingsPercentage });
+    savingsPercentage = parseInt(savingsPercentage.toFixed(2));
+    this.setState({ annualSavingsPercentage: savingsPercentage});
   },
   handleChange: function(name, e){
     if(name === 'currentAge') this.setState({ currentAge: e.target.valueAsNumber });
@@ -150,10 +152,7 @@ function populateAgeArray(min, max){
 }
 
 function calculateNewRetirementArray(startAge, endAge, startingAssets, performancePercentage, currentSalary, annualSavingsPercentage, companyMatchPercentage){
-  
   var savingsConstant = (currentSalary * (annualSavingsPercentage / 100)) + (currentSalary * (companyMatchPercentage / 100));
-  debugger;
-  console.log("savingsConstant", savingsConstant)
   var performanceDecimal = (performancePercentage / 100) + 1;
   var totalYears = endAge - startAge;
   var arr = [];
