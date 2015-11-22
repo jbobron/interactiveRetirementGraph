@@ -10,8 +10,8 @@ var RetirementAge = React.createClass({
                max="70"
                step="1"
                value={this.props.retirementAge}
-               onChange={this.props.handleChange.bind(this,'retirementAge')} 
-               onMouseUp={this.props.handleAgeRangeChange.bind(this,(this,'retirementAge'))}>
+               onChange={this.props.handleChange.bind(null,'retirementAge')} 
+               onMouseUp={this.props.handleAgeRangeChange.bind(null,'retirementAge')}>
         </input>
       </li>
     )

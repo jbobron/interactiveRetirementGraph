@@ -11,8 +11,8 @@ var CurrentSalary = React.createClass({
                readonly="true"
                maxlength="8"
                value={this.props.currentSalary} 
-               onChange={this.props.handleChange.bind(this,'currentSalary')}
-               handleKeyDown={this.props.handleKeyDown.bind(this,(this,'currentSalary'))}>
+               onChange={this.props.handleChange.bind(null,'currentSalary')}
+               handleKeyDown={this.props.handleKeyDown.bind(null,'currentSalary')}>
         </input> 
       </li>
       <AnnualSavingsPercentage {...this.props} handleChange={this.props.handleChange} handleMouseUp={this.props.handleMouseUp}/>

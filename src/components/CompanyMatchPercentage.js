@@ -10,8 +10,8 @@ var CompanyMatchPercentage = React.createClass({
                max="8"
                step="1"
                value={this.props.companyMatchPercentage}
-               onChange={this.props.handleChange.bind(this,'companyMatchPercentage')} 
-               onMouseUp={this.props.handleMouseUp.bind(this,(this,'companyMatchPercentage'))}>
+               onChange={this.props.handleChange.bind(null,'companyMatchPercentage')} 
+               onMouseUp={this.props.handleMouseUp.bind(null,'companyMatchPercentage')}>
         </input>
       </li>
     )

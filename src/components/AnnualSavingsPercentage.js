@@ -13,8 +13,8 @@ var AnnualSavingsPercentage = React.createClass({
                  max={this.props.maxSavingsPercentage}
                  step="1"
                  value={this.props.annualSavingsPercentage}
-                 onChange={this.props.handleChange.bind(this,'annualSavingsPercentage')} 
-                 onMouseUp={this.props.handleMouseUp.bind(this,(this,'annualSavingsPercentage'))}>
+                 onChange={this.props.handleChange.bind(null,'annualSavingsPercentage')} 
+                 onMouseUp={this.props.handleMouseUp.bind(null,'annualSavingsPercentage')}>
           </input>
         </li>
         <CompanyMatchPercentage {...this.props} handleChange={this.props.handleChange} handleMouseUp={this.props.handleMouseUp}/>

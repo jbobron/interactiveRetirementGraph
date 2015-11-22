@@ -9,8 +9,8 @@ var TotalAssets = React.createClass({
                readonly="true"
                maxlength="8"
                value={this.props.totalAssets} 
-               onChange={this.props.handleChange.bind(this,'totalAssets')}
-               handleKeyDown={this.props.handleKeyDown.bind(this,(this,'totalAssets'))}>
+               onChange={this.props.handleChange.bind(null,'totalAssets')}
+               handleKeyDown={this.props.handleKeyDown.bind(null,'totalAssets')}>
         </input>
       </li>
     )

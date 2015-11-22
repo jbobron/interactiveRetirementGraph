@@ -10,8 +10,8 @@ var CurrentAge = React.createClass({
                max="50"
                step="1"
                value={this.props.currentAge}
-               onChange={this.props.handleChange.bind(this,'currentAge')} 
-               onMouseUp={this.props.handleAgeRangeChange.bind(this,(this,'currentAge'))}>
+               onChange={this.props.handleChange.bind(null,'currentAge')} 
+               onMouseUp={this.props.handleAgeRangeChange.bind(null,'currentAge')}>
         </input>
       </li>
     )
