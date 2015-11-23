@@ -42,22 +42,28 @@ var Main = React.createClass({
   handleMouseUp: function(e){
     var chart = $('#container').highcharts();
     var searchForMe = chart.series[0].yData[0];
-    var noNullsArr = chart.series[0].yData.filter(function(value, index){
+    var fillerArr = chart.series[0].yData.filter(function(value, index){
       return value !== searchForMe;
     });
-    var numOfNulls = chart.series[0].yData.length - noNullsArr.length;
+    var numOfFillers = chart.series[0].yData.length - fillerArr.length;
     var newData = calculateNewRetirementArray(this.state.minimumAge, this.state.maximumAge, this.state.totalAssets, this.state.performancePercentage, this.state.currentSalary, this.state.annualSavingsPercentage, this.state.companyMatchPercentage);
     var firstVal = newData[0];
     if(this.state.wasHandleAgeRangeChangeCalled){
-      var newData = newData.slice(0,newData.length-numOfNulls);
-      while(numOfNulls-- > 0) newData.unshift(firstVal + 0.1);
+      var newData = newData.slice(0, newData.length-numOfFillers);
+      while(numOfFillers-- > 0) newData.unshift(firstVal + 0.1);
     }
     else {
       this.state.config = setStateFor('yAxis', newData, this.state.config);
     }
     chart.series[0].setData(newData);
   },
-  handleAgeRangeChange: function(name, e){ // this uses 'slice' (setExtremes) and keep original full config.xAxis.categories array
+  //EXPLAINATION FOR WHY WE ADD 0.1:
+  //to utilize setExtremees which allows us to 'transform' the graph instead of reloading it, we need to manipulate the y axis
+  //in tandum with any changes to the x axis (via age changes). We add on 0.1+the first val to the yaxis as a filler to keep the 
+  //x and y axis in sync.  we are using lastNum and temp below to check if the user has already inc their age before (meaning there
+  //will already be a .1 added onto the first val). we do this because we need all our filler values to be the same so we can count them later to take them out
+  handleAgeRangeChange: function(name, e){ 
+    // this uses 'slice' (setExtremes) and keep original full config.xAxis.categories array
     this.setState({wasHandleAgeRangeChangeCalled: true})
     if(this.state.currentAge === this.state.minimumAge) this.setState({wasHandleAgeRangeChangeCalled: false})
     var chart = $('#container').highcharts();
@@ -66,9 +72,13 @@ var Main = React.createClass({
     this.setState({previousCurrentAge: this.state.currentAge})
     chart.xAxis[0].setExtremes(this.state.currentAge - this.state.minimumAge, this.state.retirementAge - this.state.minimumAge);
     var firstVal = chart.series[0].yData[0];
+    //check if first val starts with .1, if it does DONT add another 0.1 to it
+    var temp = (firstVal * 10).toString();
+    var lastNum = parseInt(temp[temp.length - 1]);
     if(changeInAge > 0){ // for inc in current age, zeros are added to beginning of yData to correctly reflect starting assets as initial assets
       for(var i = 0; i < changeInAge; i++){
-        chart.series[0].yData.unshift(firstVal + 0.1);
+        if(lastNum === 1) chart.series[0].yData.unshift(firstVal);
+        else chart.series[0].yData.unshift(firstVal + 0.1);
         storageArr.push(chart.series[0].yData.pop()); //less years for compound interest means smaller ending assets, x values are removed from end of yData to reflect this
       }
     }
@@ -163,7 +173,7 @@ function calculateNewRetirementArray(startAge, endAge, startingAssets, performan
     arr.push( total );
     t++;
   }
-
+  //TODO: figure out how to better evaluate spending once retired
   //account for after retirement here
   var lastVal = arr[arr.length-1]
   //account for after retirement here
