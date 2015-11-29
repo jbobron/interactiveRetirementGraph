@@ -12,6 +12,7 @@ var CurrentSalary = React.createClass({
                maxlength="8"
                value={this.props.currentSalary} 
                onChange={this.props.handleChange.bind(null,'currentSalary')}
+               onBlur={this.props.handleOnBlur.bind(null,'currentSalary')}
                handleKeyDown={this.props.handleKeyDown.bind(null,'currentSalary')}>
         </input> 
       </li>

@@ -3,23 +3,26 @@ var AssetsGraph = require('./AssetsGraph');
 var CurrentAge = require('./CurrentAge');
 var RetirementAge = require('./RetirementAge');
 var CurrentSalary = require('./CurrentSalary');
-var TotalAssets = require('./TotalAssets');
+var StartingAssets = require('./StartingAssets');
+var Summary = require('./Summary');
 
 var Main = React.createClass({
   getInitialState: function(){
     return {
       currentAge: 20,
       previousCurrentAge: 0,
+      previousRetirementAge: 0,
       retirementAge: 50,
       minimumAge: 20,
       maximumAge: 100,
       currentSalary: 50000,
-      totalAssets: 0,
+      startingAssets: 0,
       performancePercentage: 5,
       annualSavingsPercentage: 8,
       companyMatchPercentage: 0,
       maxSavingsPercentage: 36,  //based on $18000 max / $50000 current salary
       wasHandleAgeRangeChangeCalled: false,
+      totalSavings: 0,
       style: { sliders: { "display": "inline-block", "padding-right": "40px" } },
       config: {
         ///this should be empty to start then on react initial load, populate using calcNewRetArr with min and max age
@@ -33,10 +36,12 @@ var Main = React.createClass({
     }
   },
   componentWillMount: function(){
+    var chart = $('#container').highcharts();
+    console.log("CHART 1", chart)
     this.setState({previousCurrentAge: this.state.currentAge})
     var populatedAgeArray = populateAgeArray(this.state.minimumAge, this.state.maximumAge);
     this.state.config = setStateFor('xAxis', populatedAgeArray, this.state.config);
-    var populatedAssetsArray = calculateNewRetirementArray(this.state.minimumAge, this.state.maximumAge, this.state.totalAssets, this.state.performancePercentage, this.state.currentSalary, this.state.annualSavingsPercentage, this.state.companyMatchPercentage);
+    var populatedAssetsArray = this.calculateNewRetirementArray(this.state.minimumAge, this.state.maximumAge, this.state.startingAssets, this.state.performancePercentage, this.state.currentSalary, this.state.annualSavingsPercentage, this.state.companyMatchPercentage, this.state.currentAge, this.state.retirementAge);
     this.state.config = setStateFor('yAxis', populatedAssetsArray, this.state.config);
   },
   handleMouseUp: function(e){
@@ -46,7 +51,8 @@ var Main = React.createClass({
       return value !== searchForMe;
     });
     var numOfFillers = chart.series[0].yData.length - fillerArr.length;
-    var newData = calculateNewRetirementArray(this.state.minimumAge, this.state.maximumAge, this.state.totalAssets, this.state.performancePercentage, this.state.currentSalary, this.state.annualSavingsPercentage, this.state.companyMatchPercentage);
+    // debugger;
+    var newData = this.calculateNewRetirementArray(this.state.minimumAge, this.state.maximumAge, this.state.startingAssets, this.state.performancePercentage, this.state.currentSalary, this.state.annualSavingsPercentage, this.state.companyMatchPercentage, this.state.currentAge, this.state.retirementAge);
     var firstVal = newData[0];
     if(this.state.wasHandleAgeRangeChangeCalled){
       var newData = newData.slice(0, newData.length-numOfFillers);
@@ -63,11 +69,17 @@ var Main = React.createClass({
   //x and y axis in sync.  we are using lastNum and temp below to check if the user has already inc their age before (meaning there
   //will already be a .1 added onto the first val). we do this because we need all our filler values to be the same so we can count them later to take them out
   handleAgeRangeChange: function(name, e){ 
+
+    //NEED TO SET STATE FOR TOTAL SAVINGS HERE
+
+
     // this uses 'slice' (setExtremes) and keep original full config.xAxis.categories array
     this.setState({wasHandleAgeRangeChangeCalled: true})
     if(this.state.currentAge === this.state.minimumAge) this.setState({wasHandleAgeRangeChangeCalled: false})
     var chart = $('#container').highcharts();
+    this.setState({previousRetirementAge: this.state.retirementAge})
     var changeInAge =  this.state.currentAge - this.state.previousCurrentAge;
+    var changeInRetirement = this.state.retirementAge - this.state.previousRetirementAge;
     var storageArr = []; 
     this.setState({previousCurrentAge: this.state.currentAge})
     chart.xAxis[0].setExtremes(this.state.currentAge - this.state.minimumAge, this.state.retirementAge - this.state.minimumAge);
@@ -88,12 +100,30 @@ var Main = React.createClass({
         chart.series[0].yData.push(storageArr.shift()); //additional y values are added back to yData to reflect inc in compound interest
       }
     }
+    console.log(chart.series[0].yData[this.state.retirementAge-this.state.currentAge], changeInAge)
+    debugger;
+
+    // var index;
+    // if(changeInAge > 0 ){
+    //   index = this.state.retirementAge - this.state.currentAge + changeInAge
+    // }
+    // if(changeInRetirement > 0){
+    //   index = this.state.retirementAge - this.state.currentAge + changeInRetirement
+    // } else {
+    //  index = this.state.retirementAge - this.state.currentAge;
+    // }
+    console.log("HELLLLOOO")
+    console.log("index", chart.series[0].yData[this.state.retirementAge - this.state.minimumAge])
+    this.setState({ totalSavings: chart.series[0].yData[this.state.retirementAge - this.state.minimumAge] })
+    // else this.setState({ totalSavings: chart.series[0].yData[this.state.retirementAge-this.state.currentAge] })
     chart.series[0].setData(chart.series[0].yData);
   },
   handleKeyDown: function(e){
     var ENTER = 13;
     if( e.keyCode == ENTER ) this.handleMouseUp(e); 
-
+  },
+  handleOnBlur: function(e){
+    this.handleMouseUp(e);
   },
   componentDidMount: function() {
     $(document.body).on('keydown', this.handleKeyDown);
@@ -113,7 +143,7 @@ var Main = React.createClass({
   handleChange: function(name, e){
     if(name === 'currentAge') this.setState({ currentAge: e.target.valueAsNumber });
     if(name === 'retirementAge') this.setState({ retirementAge: e.target.valueAsNumber });
-    if(name === 'totalAssets') this.setState({ totalAssets: Math.abs(e.target.valueAsNumber) || 0 });
+    if(name === 'startingAssets') this.setState({ startingAssets: Math.abs(e.target.valueAsNumber) || 0 });
     if(name === 'companyMatchPercentage') this.setState({ companyMatchPercentage: e.target.valueAsNumber});
     if(name === 'annualSavingsPercentage'){
       this.recalculateMaxSavingsPercentage();
@@ -126,15 +156,38 @@ var Main = React.createClass({
       this.recalculateMaxSavingsPercentage();
     } 
   },
+  calculateNewRetirementArray: function(startAge, endAge, startingAssets, performancePercentage, currentSalary, annualSavingsPercentage, companyMatchPercentage, currentAge, retirementAge){
+    var savingsConstant = (currentSalary * (annualSavingsPercentage / 100)) + (currentSalary * (companyMatchPercentage / 100));
+    var performanceDecimal = (performancePercentage / 100) + 1;
+    var totalYears = endAge - startAge;
+    var arr = [];
+    var t = 0;
+    var total;
+    while(t < totalYears){
+      total = (startingAssets * Math.pow(performanceDecimal, t)) + (savingsConstant * ((Math.pow(performanceDecimal, t) - 1) / (performanceDecimal - 1)) * performanceDecimal);
+      arr.push( total );
+      t++;
+    }
+    this.setState({ totalSavings: arr[retirementAge-currentAge]});
+    //TODO: figure out how to better evaluate spending once retired
+    //account for after retirement here
+    var lastVal = arr[arr.length-1]
+    //account for after retirement here
+    while(arr.length !== 100){
+      arr.push(lastVal-=100000)
+    }
+    return arr;
+  },
   render: function(){
     return (
       <div>
         <h1> Retirement Savings Interactive Graph</h1>
+        <Summary {...this.state} />
         <ul style={this.state.style.sliders}>
           <CurrentAge {...this.state} handleChange={this.handleChange} handleAgeRangeChange={this.handleAgeRangeChange}/>
           <RetirementAge {...this.state} handleChange={this.handleChange} handleAgeRangeChange={this.handleAgeRangeChange}/>
-          <CurrentSalary {...this.state} handleChange={this.handleChange} handleMouseUp={this.handleMouseUp} handleKeyDown={this.handleKeyDown}/>
-          <TotalAssets {...this.state} handleChange={this.handleChange} handleKeyDown={this.handleKeyDown}/>
+          <CurrentSalary {...this.state} handleChange={this.handleChange} handleOnBlur={this.handleOnBlur} handleMouseUp={this.handleMouseUp} handleKeyDown={this.handleKeyDown}/>
+          <StartingAssets {...this.state} handleChange={this.handleChange} handleOnBlur={this.handleOnBlur} handleKeyDown={this.handleKeyDown}/>
         </ul>
         <AssetsGraph ref="chart" config={this.state.config}/>
       </div>
@@ -161,28 +214,6 @@ function populateAgeArray(min, max){
   return arr;
 }
 
-function calculateNewRetirementArray(startAge, endAge, startingAssets, performancePercentage, currentSalary, annualSavingsPercentage, companyMatchPercentage){
-  var savingsConstant = (currentSalary * (annualSavingsPercentage / 100)) + (currentSalary * (companyMatchPercentage / 100));
-  var performanceDecimal = (performancePercentage / 100) + 1;
-  var totalYears = endAge - startAge;
-  var arr = [];
-  var t = 0;
-  var total;
-  while(t < totalYears){
-    total = (startingAssets * Math.pow(performanceDecimal, t)) + (savingsConstant * ((Math.pow(performanceDecimal, t) - 1) / (performanceDecimal - 1)) * performanceDecimal);
-    arr.push( total );
-    t++;
-  }
-  //TODO: figure out how to better evaluate spending once retired
-  //account for after retirement here
-  var lastVal = arr[arr.length-1]
-  //account for after retirement here
-  while(arr.length !== 100){
-    arr.push(lastVal-=100000)
-  }
-  return arr;
-}
-
 function calculateNewAgeArray(startAge, endAge){
   var arr = [];
   for(var i = startAge; i < endAge; i++){
@@ -192,3 +223,4 @@ function calculateNewAgeArray(startAge, endAge){
 }
 
 module.exports = Main;
+
