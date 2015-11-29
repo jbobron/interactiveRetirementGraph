@@ -1,10 +1,6 @@
 var React = require("react");
 
 var Summary = React.createClass({
-  // shouldComponentUpdate: function(nextProps) { //if there is a change to this.props.config return true, else return false
-  //   console.log(nextProps.annualSavingsPercentage)
-  //   return nextProps.annualSavingsPercentage !== this.props.annualSavingsPercentage;
-  // },
   getYears: function(){
     return this.props.retirementAge - this.props.currentAge;
   },
@@ -14,18 +10,12 @@ var Summary = React.createClass({
     return numberWithCommas((totalFromAssets + companyMatch).toFixed(2));
   },
   getTotalSavings: function(){
-    var index = this.props.retirementAge - this.props.currentAge;
-    // var targetVal = this.props.chart.series[0].data[index].constructor === Object ? this.props.chart.series[0].data[index]['y'] : this.props.chart.series[0].data[index];
-    // return numberWithCommas(targetVal.toFixed(2));
-
-    return this.props.totalSavings;
+    return numberWithCommas(this.props.totalSavings.toFixed(2));
   },
   render: function(){
-    console.log("reloading");
     return (    
       <div>
-        <p>Over the next {this.getYears()} years, with an annual savings of ${this.getAnnualSavings()} and 
-        starting assets of ${this.props.startingAssets}, you will generate ${this.getTotalSavings()}</p>
+        <p style={this.props.style.text}>Based on your retirement plan, over {this.getYears()} years, you will save ${this.getTotalSavings()}!</p>
       </div>
         
     )
@@ -37,3 +27,8 @@ function numberWithCommas(x) {
 }
 
 module.exports = Summary;
+
+
+
+// <p>Over the next {this.getYears()} years, with an annual savings of ${this.getAnnualSavings()} and 
+// starting assets of ${this.props.startingAssets}, you will generate ${this.getTotalSavings()}</p>

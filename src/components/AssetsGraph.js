@@ -10,7 +10,7 @@ var AssetsGraph = React.createClass({
   render: function(){
     return (
       <div>
-        <h3>Your Assets</h3>
+        <h3 style={this.props.style.text}>Your Assets</h3>
         <Highcharts id="container" config={this.props.config} />
       </div>
     )

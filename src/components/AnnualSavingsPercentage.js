@@ -7,7 +7,7 @@ var AnnualSavingsPercentage = React.createClass({
     return ( 
       <ul style={this.props.style.sliders}>   
         <li style={this.props.style.sliders}>
-          <h3>Annual Savings Percentage: {this.props.annualSavingsPercentage} %</h3>
+          <h3 style={this.props.style.text}>Annual Savings Percentage: {this.props.annualSavingsPercentage} %</h3>
           <input type="range"
                  min="0"
                  max={this.props.maxSavingsPercentage}

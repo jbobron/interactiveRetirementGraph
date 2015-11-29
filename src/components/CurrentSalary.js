@@ -6,7 +6,7 @@ var CurrentSalary = React.createClass({
     return ( 
       <ul style={this.props.style.sliders}>   
       <li style={this.props.style.sliders}>
-        <h3>Current Salary: $ {this.props.currentSalary}</h3>
+        <h3 style={this.props.style.text}>Current Salary: $ {this.props.currentSalary}</h3>
         <input type="number"
                readonly="true"
                maxlength="8"

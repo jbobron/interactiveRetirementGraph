@@ -4,7 +4,7 @@ var StartingAssets = React.createClass({
   render: function(){
     return (    
       <li style={this.props.style.sliders}>
-        <h3>Starting Assets: $ {this.props.startingAssets}</h3>
+        <h3 style={this.props.style.text}>Starting Assets: $ {this.props.startingAssets}</h3>
         <input type="number"
                readonly="true"
                maxlength="8"

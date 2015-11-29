@@ -11,7 +11,6 @@ var Main = React.createClass({
     return {
       currentAge: 20,
       previousCurrentAge: 0,
-      previousRetirementAge: 0,
       retirementAge: 50,
       minimumAge: 20,
       maximumAge: 100,
@@ -23,7 +22,7 @@ var Main = React.createClass({
       maxSavingsPercentage: 36,  //based on $18000 max / $50000 current salary
       wasHandleAgeRangeChangeCalled: false,
       totalSavings: 0,
-      style: { sliders: { "display": "inline-block", "padding-right": "40px" } },
+      style: { sliders: { "display": "inline-block", "padding-right": "40px" }, text: {"font-family":"Roboto"} },
       config: {
         ///this should be empty to start then on react initial load, populate using calcNewRetArr with min and max age
         series: [{ name: "Assets", data: [] }],
@@ -37,7 +36,6 @@ var Main = React.createClass({
   },
   componentWillMount: function(){
     var chart = $('#container').highcharts();
-    console.log("CHART 1", chart)
     this.setState({previousCurrentAge: this.state.currentAge})
     var populatedAgeArray = populateAgeArray(this.state.minimumAge, this.state.maximumAge);
     this.state.config = setStateFor('xAxis', populatedAgeArray, this.state.config);
@@ -68,18 +66,12 @@ var Main = React.createClass({
   //in tandum with any changes to the x axis (via age changes). We add on 0.1+the first val to the yaxis as a filler to keep the 
   //x and y axis in sync.  we are using lastNum and temp below to check if the user has already inc their age before (meaning there
   //will already be a .1 added onto the first val). we do this because we need all our filler values to be the same so we can count them later to take them out
-  handleAgeRangeChange: function(name, e){ 
-
-    //NEED TO SET STATE FOR TOTAL SAVINGS HERE
-
-
+  handleAgeRangeChange: function(name, e){
     // this uses 'slice' (setExtremes) and keep original full config.xAxis.categories array
     this.setState({wasHandleAgeRangeChangeCalled: true})
     if(this.state.currentAge === this.state.minimumAge) this.setState({wasHandleAgeRangeChangeCalled: false})
     var chart = $('#container').highcharts();
-    this.setState({previousRetirementAge: this.state.retirementAge})
     var changeInAge =  this.state.currentAge - this.state.previousCurrentAge;
-    var changeInRetirement = this.state.retirementAge - this.state.previousRetirementAge;
     var storageArr = []; 
     this.setState({previousCurrentAge: this.state.currentAge})
     chart.xAxis[0].setExtremes(this.state.currentAge - this.state.minimumAge, this.state.retirementAge - this.state.minimumAge);
@@ -100,22 +92,7 @@ var Main = React.createClass({
         chart.series[0].yData.push(storageArr.shift()); //additional y values are added back to yData to reflect inc in compound interest
       }
     }
-    console.log(chart.series[0].yData[this.state.retirementAge-this.state.currentAge], changeInAge)
-    debugger;
-
-    // var index;
-    // if(changeInAge > 0 ){
-    //   index = this.state.retirementAge - this.state.currentAge + changeInAge
-    // }
-    // if(changeInRetirement > 0){
-    //   index = this.state.retirementAge - this.state.currentAge + changeInRetirement
-    // } else {
-    //  index = this.state.retirementAge - this.state.currentAge;
-    // }
-    console.log("HELLLLOOO")
-    console.log("index", chart.series[0].yData[this.state.retirementAge - this.state.minimumAge])
     this.setState({ totalSavings: chart.series[0].yData[this.state.retirementAge - this.state.minimumAge] })
-    // else this.setState({ totalSavings: chart.series[0].yData[this.state.retirementAge-this.state.currentAge] })
     chart.series[0].setData(chart.series[0].yData);
   },
   handleKeyDown: function(e){
@@ -181,7 +158,7 @@ var Main = React.createClass({
   render: function(){
     return (
       <div>
-        <h1> Retirement Savings Interactive Graph</h1>
+        <h1 style={this.state.style.text}> Retirement Savings Interactive Graph</h1>
         <Summary {...this.state} />
         <ul style={this.state.style.sliders}>
           <CurrentAge {...this.state} handleChange={this.handleChange} handleAgeRangeChange={this.handleAgeRangeChange}/>
@@ -189,7 +166,7 @@ var Main = React.createClass({
           <CurrentSalary {...this.state} handleChange={this.handleChange} handleOnBlur={this.handleOnBlur} handleMouseUp={this.handleMouseUp} handleKeyDown={this.handleKeyDown}/>
           <StartingAssets {...this.state} handleChange={this.handleChange} handleOnBlur={this.handleOnBlur} handleKeyDown={this.handleKeyDown}/>
         </ul>
-        <AssetsGraph ref="chart" config={this.state.config}/>
+        <AssetsGraph {...this.state} ref="chart" config={this.state.config}/>
       </div>
     )
   }
@@ -223,4 +200,3 @@ function calculateNewAgeArray(startAge, endAge){
 }
 
 module.exports = Main;
-

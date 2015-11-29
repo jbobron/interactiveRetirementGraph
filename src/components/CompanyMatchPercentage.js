@@ -4,7 +4,7 @@ var CompanyMatchPercentage = React.createClass({
   render: function(){
     return (    
       <li style={this.props.style.sliders}>
-        <h3>Company Match Percentage: {this.props.companyMatchPercentage} %</h3>
+        <h3 style={this.props.style.text}>Company Match Percentage: {this.props.companyMatchPercentage} %</h3>
         <input type="range"
                min="0"
                max="8"

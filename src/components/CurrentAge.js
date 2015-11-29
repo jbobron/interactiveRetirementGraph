@@ -4,7 +4,7 @@ var CurrentAge = React.createClass({
   render: function(){
     return (    
       <li style={this.props.style.sliders}>
-        <h3>Current Age: {this.props.currentAge}</h3>
+        <h3 style={this.props.style.text}>Current Age: {this.props.currentAge}</h3>
         <input type="range"
                min="20"
                max="50"
