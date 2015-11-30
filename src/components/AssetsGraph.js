@@ -1,7 +1,12 @@
 var React = require('react');
 var Highcharts = require('react-highcharts');
-// debugger;
-Highcharts.Highcharts.setOptions({title: {text: "How much money will you save?"}, lang: { thousandsSep: ',' }})
+Highcharts.Highcharts.setOptions({ 
+  xAxis: { tickInterval: 5 }, 
+  chart: { style: {fontFamily: "Roboto"} },
+  title: { text: "How much money will you save?" }, 
+  credits: { enabled: false }, 
+  lang: { thousandsSep: ',' }
+});
 
 var AssetsGraph = React.createClass({
   shouldComponentUpdate: function(nextProps) { //if there is a change to this.props.config return true, else return false
@@ -265,6 +270,3 @@ Highcharts.theme = {
   textColor: '#C0C0C0',
   maskColor: 'rgba(255,255,255,0.3)'
 };
-
-// Apply the theme
-//var highchartsOptions = Highcharts.Highcharts.setOptions(Highcharts.theme);
