@@ -9,14 +9,19 @@ Highcharts.Highcharts.setOptions({
 });
 
 var AssetsGraph = React.createClass({
+  componentDidMount: function(){
+    var chart = this.refs.chart.getChart();
+    // this.props.refs = this.refs;
+    this.props.setRefProps(this.refs);
+    chart.xAxis[0].setExtremes(this.props.currentAge - this.props.minimumAge, this.props.retirementAge - this.props.minimumAge);
+  },
   shouldComponentUpdate: function(nextProps) { //if there is a change to this.props.config return true, else return false
     return nextProps.config.series[0].data !== this.props.config.series[0].data || nextProps.config.xAxis.categories !== this.props.config.xAxis.categories;
   },
   render: function(){
     return (
-      <div>
-        <h3 style={this.props.style.text}>Your Assets</h3>
-        <Highcharts id="container" config={this.props.config} />
+      <div style={this.props.style.chart}>
+        <Highcharts id="container" ref="chart" style={this.props.style.graph} config={this.props.config} />
       </div>
     )
   }

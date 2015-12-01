@@ -15,7 +15,7 @@ var Summary = React.createClass({
   render: function(){
     return (    
       <div>
-        <p style={this.props.style.text}>Based on your retirement plan, over {this.getYears()} years, you will save ${this.getTotalSavings()}</p>
+        <h3 style={this.props.style.text}>Based on your retirement plan, you will save <strong> ${this.getTotalSavings()} </strong> over <strong> {this.getYears()} </strong> years!</h3>
       </div>
         
     )

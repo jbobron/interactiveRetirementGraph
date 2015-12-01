@@ -22,7 +22,18 @@ var Main = React.createClass({
       maxSavingsPercentage: 36,  //based on $18000 max / $50000 current salary
       wasHandleAgeRangeChangeCalled: false,
       totalSavings: 0,
-      style: { sliders: { "display": "inline-block", "padding-right": "40px" }, text: {"font-family":"Roboto"} },
+      refs: null,
+      style: {
+        background: { "background-color": "#E9F1F2", "padding": "20px"},
+        ul: { "display": "inline","padding-left": "0px" },
+        sliders: { "display": "inline-block","padding-left": "0px" },
+        slider: { "display": "inline-block", "padding-left": "20px" }, 
+        lastSlider: {"display": "inline-block", "padding-right": "20px","padding-left": "20px"},
+        text: {"font-family":"Roboto", "text-align": "center"},
+        chart: {"padding-bottom":"50px", "padding-top":"50px", "background": "#4fc6de", "max-width": "1560px"},
+        graph: {"background": "white", "max-width": "1560px"},
+        input: {"padding": "10px", "border-radius": "10px", "border": "0 none", "font-size": "15px", "text-align": "center", "width": "150px"}
+      },
       config: {
         ///this should be empty to start then on react initial load, populate using calcNewRetArr with min and max age
         series: [{ name: "Assets", data: [] }],
@@ -35,7 +46,6 @@ var Main = React.createClass({
     }
   },
   componentWillMount: function(){
-    var chart = $('#container').highcharts();
     this.setState({previousCurrentAge: this.state.currentAge})
     var populatedAgeArray = populateAgeArray(this.state.minimumAge, this.state.maximumAge);
     this.state.config = setStateFor('xAxis', populatedAgeArray, this.state.config);
@@ -43,7 +53,7 @@ var Main = React.createClass({
     this.state.config = setStateFor('yAxis', populatedAssetsArray, this.state.config);
   },
   handleMouseUp: function(e){
-    var chart = $('#container').highcharts();
+    var chart = this.state.refs.chart.getChart();
     var searchForMe = chart.series[0].yData[0];
     var fillerArr = chart.series[0].yData.filter(function(value, index){
       return value !== searchForMe;
@@ -70,7 +80,9 @@ var Main = React.createClass({
     // this uses 'slice' (setExtremes) and keep original full config.xAxis.categories array
     this.setState({wasHandleAgeRangeChangeCalled: true})
     if(this.state.currentAge === this.state.minimumAge) this.setState({wasHandleAgeRangeChangeCalled: false})
-    var chart = $('#container').highcharts();
+    var chart = this.state.refs.chart.getChart();
+    chart.xAxis[0].setExtremes(this.props.currentAge - this.props.minimumAge, this.props.retirementAge - this.props.minimumAge);
+  
     var changeInAge =  this.state.currentAge - this.state.previousCurrentAge;
     var storageArr = []; 
     this.setState({previousCurrentAge: this.state.currentAge})
@@ -104,8 +116,6 @@ var Main = React.createClass({
   },
   componentDidMount: function() {
     $(document.body).on('keydown', this.handleKeyDown);
-    var chart = $('#container').highcharts();
-    chart.xAxis[0].setExtremes(this.state.currentAge - this.state.minimumAge, this.state.retirementAge - this.state.minimumAge);
   },
   recalculateMaxSavingsPercentage : function(){
     var maxSavingsPercentage = (18000/this.state.currentSalary)*100 > 100 ? 100 : (18000/this.state.currentSalary)*100;
@@ -133,6 +143,9 @@ var Main = React.createClass({
       this.recalculateMaxSavingsPercentage();
     } 
   },
+  setRefProps: function(newrefs){
+    this.state.refs =  newrefs;
+  },
   calculateNewRetirementArray: function(startAge, endAge, startingAssets, performancePercentage, currentSalary, annualSavingsPercentage, companyMatchPercentage, currentAge, retirementAge){
     var savingsConstant = (currentSalary * (annualSavingsPercentage / 100)) + (currentSalary * (companyMatchPercentage / 100));
     var performanceDecimal = (performancePercentage / 100) + 1;
@@ -157,8 +170,7 @@ var Main = React.createClass({
   },
   render: function(){
     return (
-      <div>
-        <h1 style={this.state.style.text}> Retirement Savings Interactive Graph</h1>
+      <div style={this.state.style.background}>
         <Summary {...this.state} />
         <ul style={this.state.style.sliders}>
           <CurrentAge {...this.state} handleChange={this.handleChange} handleAgeRangeChange={this.handleAgeRangeChange}/>
@@ -166,7 +178,7 @@ var Main = React.createClass({
           <CurrentSalary {...this.state} handleChange={this.handleChange} handleOnBlur={this.handleOnBlur} handleMouseUp={this.handleMouseUp} handleKeyDown={this.handleKeyDown}/>
           <StartingAssets {...this.state} handleChange={this.handleChange} handleOnBlur={this.handleOnBlur} handleKeyDown={this.handleKeyDown}/>
         </ul>
-        <AssetsGraph {...this.state} ref="chart" config={this.state.config}/>
+        <AssetsGraph {...this.state} setRefProps={this.setRefProps} config={this.state.config}/>
       </div>
     )
   }
