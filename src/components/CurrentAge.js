@@ -12,6 +12,7 @@ var CurrentAge = React.createClass({
                step="1"
                value={this.props.currentAge}
                onChange={this.props.handleChange.bind(null,'currentAge')} 
+               onTouchEnd={this.props.handleAgeRangeChange.bind(null,'currentAge')}
                onMouseUp={this.props.handleAgeRangeChange.bind(null,'currentAge')}>
         </input>
       </li>

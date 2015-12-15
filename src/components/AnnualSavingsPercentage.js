@@ -15,7 +15,8 @@ var AnnualSavingsPercentage = React.createClass({
                  max={this.props.maxSavingsPercentage}
                  step="1"
                  value={this.props.annualSavingsPercentage}
-                 onChange={this.props.handleChange.bind(null,'annualSavingsPercentage')} 
+                 onChange={this.props.handleChange.bind(null,'annualSavingsPercentage')}
+                 onTouchEnd={this.props.handleMouseUp.bind(null,'annualSavingsPercentage')}
                  onMouseUp={this.props.handleMouseUp.bind(null,'annualSavingsPercentage')}>
           </input>
         </li>

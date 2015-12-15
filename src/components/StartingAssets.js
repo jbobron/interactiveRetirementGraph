@@ -4,8 +4,11 @@ var StartingAssets = React.createClass({
   render: function(){
     return (    
       <li className="slidersReSize" style={this.props.style.slider}>
-        <h5 style={this.props.style.text}>Starting Assets: $ {this.props.startingAssets}</h5>
+        <h5 style={this.props.style.text}>Starting Assets:</h5>
+        <div>
+        <span className="dollarSign" style={this.props.style.dollarSign}>$</span>
         <input type="number"
+               id="inputbox"
                className="slidersReSize"
                readonly="true"
                maxlength="8"
@@ -16,6 +19,7 @@ var StartingAssets = React.createClass({
                handleKeyDown={this.props.handleKeyDown.bind(null,'startingAssets')}
                onBlur={this.props.handleOnBlur.bind(null,'startingAssets')}>
         </input>
+        </div>
       </li>
     )
   }

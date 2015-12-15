@@ -28,11 +28,14 @@ var Main = React.createClass({
         ul: { "display": "inline","padding-left": "0px" },
         sliders: { "display": "inline-block","padding-left": "0px" },
         slider: { "display": "inline-block", "padding-left": "20px" }, 
+        mobileSlider: {"cursor":"pointer"},
         lastSlider: {"display": "inline-block", "padding-right": "20px","padding-left": "20px"},
         text: {"font-family":"Roboto", "text-align": "center"},
         chart: {"padding-bottom":"50px", "padding-top":"50px", "background": "#4fc6de", "max-width": "1560px"},
         graph: {"background": "white", "max-width": "1560px"},
-        input: {"padding": "10px", "border-radius": "10px", "border": "0 none", "font-size": "15px", "text-align": "center", "width": "150px"}
+        input: {"padding": "10px", "border-radius": "10px", "border": "0 none", "font-size": "15px", "text-align": "center", "width": "120px"},
+        dollarSign: {"float": "left", "margin-top": "6px"}
+
       },
       config: {
         ///this should be empty to start then on react initial load, populate using calcNewRetArr with min and max age
@@ -115,7 +118,7 @@ var Main = React.createClass({
     this.handleMouseUp(e);
   },
   componentDidMount: function() {
-    $(document.body).on('keydown', this.handleKeyDown);
+    $(document.body).on('keydown', this.handleKeyDown);    
   },
   recalculateMaxSavingsPercentage : function(){
     var maxSavingsPercentage = (18000/this.state.currentSalary)*100 > 100 ? 100 : (18000/this.state.currentSalary)*100;
