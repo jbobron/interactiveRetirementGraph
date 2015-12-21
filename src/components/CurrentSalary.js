@@ -1,17 +1,11 @@
 var React = require("react");
 var AnnualSavingsPercentage = require('./AnnualSavingsPercentage');
+var StartingAssets = require('./StartingAssets');
 
 var CurrentSalary = React.createClass({
   getValue: function(){
-    // if(!this.isMounted()) return 50000
-    // var node = this.refs.aspInput.getDOMNode();
-    // var val = this.props.currentSalary;
-    // val = this.numberWithCommas(val);
-    // val = "$" + val;
-    // node.value = val;
     return this.props.currentSalary;
   },
-
   numberWithCommas: function(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   },
@@ -36,6 +30,7 @@ var CurrentSalary = React.createClass({
           </input> 
           </div>
         </li>
+        <StartingAssets {...this.props} handleChange={this.props.handleChange} handleOnBlur={this.props.handleOnBlur} handleKeyDown={this.props.handleKeyDown}/>
       </ul>
     )
   }

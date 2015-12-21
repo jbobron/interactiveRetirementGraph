@@ -3,7 +3,7 @@ var React = require("react");
 var StartingAssets = React.createClass({
   render: function(){
     return (    
-      <li className="slidersReSize" style={this.props.style.slider}>
+      <li className="slidersReSize" style={this.props.style.lastSlider}>
         <h5 style={this.props.style.text}>Starting Assets:</h5>
         <div>
         <span className="dollarSign" style={this.props.style.dollarSign}>$</span>

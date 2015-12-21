@@ -25,11 +25,11 @@ var Main = React.createClass({
       refs: null,
       style: {
         background: { "background-color": "#E9F1F2", "padding": "20px"},
-        ul: { "display": "inline","padding-left": "0px" },
+        ul: { "display": "inline","padding-left": "0px", "width": "100%" },
         sliders: { "display": "inline-block","padding-left": "0px" },
-        slider: { "display": "inline-block", "padding-left": "20px" }, 
+        slider: { "display": "inline-block", "padding-left": "2%", "padding-right":"2%" }, 
+        lastSlider: {"display": "inline-block", "padding-left": "2%","padding-right": "0%"},
         mobileSlider: {"cursor":"pointer"},
-        lastSlider: {"display": "inline-block", "padding-right": "20px","padding-left": "20px"},
         text: {"font-family":"Roboto", "text-align": "center"},
         chart: {"padding-bottom":"50px", "padding-top":"50px", "background": "#4fc6de", "max-width": "1560px"},
         graph: {"background": "white", "max-width": "1560px"},
@@ -179,7 +179,6 @@ var Main = React.createClass({
           <CurrentAge {...this.state} handleChange={this.handleChange} handleAgeRangeChange={this.handleAgeRangeChange}/>
           <RetirementAge {...this.state} handleChange={this.handleChange} handleAgeRangeChange={this.handleAgeRangeChange}/>
           <CurrentSalary {...this.state} handleChange={this.handleChange} handleOnBlur={this.handleOnBlur} handleMouseUp={this.handleMouseUp} handleKeyDown={this.handleKeyDown}/>
-          <StartingAssets {...this.state} handleChange={this.handleChange} handleOnBlur={this.handleOnBlur} handleKeyDown={this.handleKeyDown}/>
         </ul>
         <AssetsGraph {...this.state} setRefProps={this.setRefProps} config={this.state.config}/>
       </div>
